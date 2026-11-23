@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nyx Radar — Token Launch Radar</title>
+<link rel="stylesheet" href="app.css">
+<script src="../data.js"></script>
+</head>
+<body>
+<header class="masthead">
+  <div class="mast-in">
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div>
+        <h1>Nyx Radar</h1>
+        <p class="tag">Token launch radar &middot; which pre-token protocol is worth farming, and what it would pay</p>
+      </div>
+    </div>
+    <div class="mast-stats">
+      <span class="pill farm" id="pill-farm">– FARM</span>
+      <span class="pill marginal" id="pill-marginal">– MARGINAL</span>
+      <span class="pill skip" id="pill-skip">– SKIP</span>
+    </div>
+  </div>
+  <p class="mast-meta" id="mast-meta"></p>
+</header>
+
+<main id="board-view">
+  <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+  <section class="charts">
+    <div class="card chart-card">
+      <h2>Where the value sits</h2>
+      <p class="sub">Implied token value by category, stacked by verdict — the whole board in one bar.</p>
+      <div id="chart-accounting" class="chart"></div>
+    </div>
+    <div class="card chart-card">
+      <h2>Twice the TVL is not twice the value</h2>
+      <p class="sub">Log TVL against implied value, one dot per protocol. The line is the fitted model.</p>
+      <div id="chart-scatter" class="chart"></div>
+    </div>
+  </section>
+
+  <section class="card board-card">
+    <div class="board-head">
+      <h2>The board</h2>
+      <p class="sub" id="board-count"></p>
+    </div>
+    <div class="controls">
+      <div class="tabs" id="verdict-tabs" role="tablist">
+        <button data-v="ALL" class="on">All <b id="c-all"></b></button>
+        <button data-v="FARM">FARM <b id="c-farm"></b></button>
+        <button data-v="MARGINAL">MARGINAL <b id="c-marginal"></b></button>
+        <button data-v="SKIP">SKIP <b id="c-skip"></b></button>
+      </div>
+      <label>Category <select id="f-cat"><option value="">All categories</option></select></label>
+      <label>Search <input id="f-q" type="search" placeholder="protocol name or slug"></label>
+      <label class="chk"><input id="f-watch" type="checkbox"> Watchlist only</label>
+    </div>
+    <div class="table-wrap">
+      <table id="board">
+        <thead><tr>
+          <th data-k="rank">#</th>
+          <th data-k="name">Protocol</th>
+          <th data-k="category">Category</th>
+          <th data-k="tvl_usd" class="num">TVL</th>
+          <th data-k="change_7d" class="num">7D</th>
+          <th data-k="age_days" class="num">Age</th>
+          <th data-k="implied_value_usd" class="num">Implied value</th>
+          <th data-k="odds" class="num">Token odds</th>
+          <th data-k="net_per_hour_usd" class="num">Net / hour</th>
+          <th data-k="verdict">Verdict</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="table-note">Click a row for its farm plan, nearest peers and a sensitivity check. Click a column heading to sort.</p>
+    <button id="more" class="more">Show more</button>
+  </section>
+
+  <section class="card proof">
+    <h2>Why this model works</h2>
+    <p class="formula" id="formula"></p>
+    <div class="proof-grid">
+      <div>
+        <h3>Every term tested twice — kept only if it wins both</h3>
+        <table class="mini" id="keepdrop"><thead><tr><th>Term</th><th class="num">Walk-forward miss</th><th class="num">Leave-one-out miss</th><th>Call</th></tr></thead><tbody></tbody></table>
+        <p class="fine">Walk-forward: fit on the 47 earliest listed protocols, tested on the 48 latest. Leave-one-out: refit 128 times, each protocol held out once. Miss is the median factor by which the prediction is off.</p>
+      </div>
+      <div>
+        <h3>Range honesty</h3>
+        <p class="big-num" id="range-nums"></p>
+        <div class="range-bar"><span id="range-band"></span><i id="range-mark"></i></div>
+        <p class="fine" id="range-note"></p>
+        <h3>Token odds beat guessing the average</h3>
+        <div class="brier"><div class="brier-row"><span>Category odds</span><div class="brier-track"><span id="brier-odds"></span></div><b id="brier-odds-n"></b></div>
+        <div class="brier-row"><span>Flat average</span><div class="brier-track"><span id="brier-flat"></span></div><b id="brier-flat-n"></b></div></div>
+        <p class="fine">Brier score over all 758 protocols (lower is better): category odds from each category&rsquo;s own launch record, shrunk toward the overall live rate.</p>
+      </div>
+    </div>
+    <p class="integrity" id="integrity"></p>
+  </section>
+
+  <section class="card live-card">
+    <h2>Already trading — shown apart, never ranked</h2>
+    <p class="sub">Live-token protocols carry the market&rsquo;s own value, so they set the model instead of joining the board.</p>
+    <table class="mini live-table"><thead><tr><th>#</th><th>Protocol</th><th>Category</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">Mcap / TVL</th></tr></thead><tbody id="live-rows"></tbody></table>
+  </section>
+</main>
+
+<main id="detail-view" hidden>
+  <p><button id="back" class="back">&larr; Back to the board</button></p>
+  <section class="card detail-hero">
+    <div class="detail-title">
+      <span class="rank-big" id="d-rank"></span>
+      <div><h2 id="d-name"></h2><p class="sub" id="d-sub"></p></div>
+      <span class="pill big" id="d-verdict"></span>
+    </div>
+    <div class="tiles" id="d-tiles"></div>
+  </section>
+  <section class="card">
+    <h2>Farm plan — seven steps, every step costed</h2>
+    <ol class="steps" id="d-steps"></ol>
+  </section>
+  <section class="card">
+    <h2>Your plan, your numbers</h2>
+    <p class="sub">Move the sliders. The maths is the same as the board&rsquo;s: expected drop is token odds &times; the drop, costs are gas plus $2 a week for 7 weeks plus 5% a year on the deposit for 45 days.</p>
+    <div class="sliders">
+      <label>Deposit <b id="sl-deposit-v"></b><input id="sl-deposit" type="range" min="50" max="500" step="10" value="150"></label>
+      <label>Drop share <b id="sl-share-v"></b><input id="sl-share" type="range" min="25" max="200" step="5" value="100"></label>
+    </div>
+    <p class="big-num" id="sl-out"></p>
+    <div id="sl-matrix"></div>
+  </section>
+  <section class="card">
+    <h2>Nearest peers</h2>
+    <p class="sub">Same category, closest implied value — the protocols this one is really competing with.</p>
+    <table class="mini"><thead><tr><th>#</th><th>Protocol</th><th class="num">TVL</th><th class="num">Implied value</th><th class="num">Net / hour</th><th>Verdict</th></tr></thead><tbody id="d-peers"></tbody></table>
+  </section>
+</main>
+
+<footer>
+  <p id="foot"></p>
+  <p>Method: implied value = exp(6.9646 + 0.5223 &middot; ln TVL), fitted at run time on the 128 live-token protocols. Farm pool = 7% of implied value; farmers = TVL / $8,000, clamped 200–100,000; one farmer&rsquo;s drop is capped at 1% of the pool. Costs: $12 gas on Ethereum else $3, $2 a week for 7 weeks, $0.92 opportunity cost. FARM means net above $0 and at least $25 an hour; MARGINAL means net above $0; anything else is SKIP. Nothing on this page fetches anything: the whole dataset ships inside data.js.</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
