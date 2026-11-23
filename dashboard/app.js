@@ -65,7 +65,7 @@
       top8.push({ name: 'Other (' + rest.length + ' categories)', v: o });
     }
     var W = 620, labelW = 168, max = top8[0].v.total, bw = W - labelW - 70, rh = 34, H = top8.length * rh + 34;
-    var col = { farm: '#0e7c5b', marginal: '#b45309', skip: '#9aa3ad' };
+    var col = { farm: '#00f5a0', marginal: '#fbbf24', skip: '#64748b' };
     var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Implied value by category">';
     top8.forEach(function (c, i) {
       var y = 8 + i * rh, x = labelW, acc = 0;
@@ -77,9 +77,9 @@
       });
       s += '<text class="ax-t" x="' + (x + acc + 8).toFixed(1) + '" y="' + (y + 15) + '">' + money(c.v.total) + '</text>';
     });
-    s += '<g class="leg"><rect x="' + labelW + '" y="' + (H - 20) + '" width="11" height="11" fill="#0e7c5b"/><text x="' + (labelW + 16) + '" y="' + (H - 11) + '">FARM</text>' +
-      '<rect x="' + (labelW + 76) + '" y="' + (H - 20) + '" width="11" height="11" fill="#b45309"/><text x="' + (labelW + 92) + '" y="' + (H - 11) + '">MARGINAL</text>' +
-      '<rect x="' + (labelW + 178) + '" y="' + (H - 20) + '" width="11" height="11" fill="#9aa3ad"/><text x="' + (labelW + 194) + '" y="' + (H - 11) + '">SKIP</text></g></svg>';
+    s += '<g class="leg"><rect x="' + labelW + '" y="' + (H - 20) + '" width="11" height="11" fill="#00f5a0"/><text x="' + (labelW + 16) + '" y="' + (H - 11) + '">FARM</text>' +
+      '<rect x="' + (labelW + 76) + '" y="' + (H - 20) + '" width="11" height="11" fill="#fbbf24"/><text x="' + (labelW + 92) + '" y="' + (H - 11) + '">MARGINAL</text>' +
+      '<rect x="' + (labelW + 178) + '" y="' + (H - 20) + '" width="11" height="11" fill="#64748b"/><text x="' + (labelW + 194) + '" y="' + (H - 11) + '">SKIP</text></g></svg>';
     $('chart-accounting').innerHTML = s;
   })();
 
@@ -92,7 +92,7 @@
     var y0 = Math.floor(Math.min.apply(null, ys)), y1 = Math.ceil(Math.max.apply(null, ys));
     var X = function (v) { return pl + (v - x0) / (x1 - x0) * (W - pl - pr); };
     var Y = function (v) { return pt + (y1 - v) / (y1 - y0) * (H - pt - pb); };
-    var col = { FARM: '#0e7c5b', MARGINAL: '#b45309', SKIP: '#9aa3ad' };
+    var col = { FARM: '#00f5a0', MARGINAL: '#fbbf24', SKIP: '#64748b' };
     var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Log TVL against implied value">';
     for (var gx = x0; gx <= x1; gx++) {
       s += '<line class="grid" x1="' + X(gx) + '" y1="' + pt + '" x2="' + X(gx) + '" y2="' + (H - pb) + '"/>';
@@ -106,7 +106,7 @@
     s += '<text class="ax" x="14" y="' + ((H - pt - pb) / 2 + pt) + '" text-anchor="middle" transform="rotate(-90 14 ' + ((H - pt - pb) / 2 + pt) + ')">Implied value (log scale)</text>';
     var lx0 = x0, lx1 = x1;
     var ly0 = (fit.b0 + fit.b1 * Math.LN10 * lx0) / Math.LN10, ly1 = (fit.b0 + fit.b1 * Math.LN10 * lx1) / Math.LN10;
-    s += '<line x1="' + X(lx0) + '" y1="' + Y(ly0) + '" x2="' + X(lx1) + '" y2="' + Y(ly1) + '" stroke="#5b3df0" stroke-width="2" stroke-dasharray="6 4"/>';
+    s += '<line x1="' + X(lx0) + '" y1="' + Y(ly0) + '" x2="' + X(lx1) + '" y2="' + Y(ly1) + '" stroke="#00f5a0" stroke-width="2" stroke-dasharray="6 4"/>';
     rows.forEach(function (r) {
       s += '<circle cx="' + X(Math.log10(r.tvl_usd)).toFixed(1) + '" cy="' + Y(Math.log10(r.implied_value_usd)).toFixed(1) + '" r="3.2" fill="' + col[r.verdict] + '" fill-opacity="0.85"><title>' + esc(r.name) + ' — ' + money(r.implied_value_usd) + ' · ' + r.verdict + '</title></circle>';
     });
